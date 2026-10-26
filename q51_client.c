@@ -56,14 +56,21 @@ int main(int argc, char *argv[])
     }
     int port = argc >= 3 ? port_number(argv[2]) : 8080;
     const char *message = argc == 4 ? argv[3] : "Hello from the client!";
+
     // AF_INET selects IPv4. htons stores the port in the byte order expected by the network.
-    struct sockaddr_in address = {.sin_family = AF_INET, .sin_port = htons((unsigned short)port)};
+    struct sockaddr_in address =
+    {
+        .sin_family = AF_INET,
+        .sin_port = htons((unsigned short)port)
+    };
+
     // Convert the address from readable text into the binary form used by the socket.
     if (inet_pton(AF_INET, argv[1], &address.sin_addr) != 1)
     {
         fputs("Enter a numeric IPv4 address, e.g. 127.0.0.1.\n", stderr);
         return 1;
     }
+
     // SOCK_STREAM creates a TCP socket, which provides an ordered stream of bytes.
     int fd = socket(AF_INET, SOCK_STREAM, 0);
     if (fd == -1)
@@ -71,6 +78,7 @@ int main(int argc, char *argv[])
         perror("socket");
         return 1;
     }
+
     // Connect to the listening server before sending the message.
     if (connect(fd, (struct sockaddr *)&address, sizeof(address)) == -1)
     {
@@ -78,6 +86,7 @@ int main(int argc, char *argv[])
         close(fd);
         return 1;
     }
+
     // Send the full request, even if the system accepts it in smaller pieces.
     if (send_all(fd, message, strlen(message)) == -1)
     {

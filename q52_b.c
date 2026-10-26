@@ -63,9 +63,12 @@ static int listen_socket(int port)
         close(fd);
         exit(1);
     }
-    struct sockaddr_in address = {.sin_family = AF_INET,
-                                  .sin_port = htons((unsigned short)port),
-                                  .sin_addr.s_addr = htonl(INADDR_ANY)};
+    struct sockaddr_in address =
+    {
+        .sin_family = AF_INET,
+        .sin_port = htons((unsigned short)port),
+        .sin_addr.s_addr = htonl(INADDR_ANY)
+    };
     if (bind(fd, (struct sockaddr *)&address, sizeof(address)) == -1 || listen(fd, 10) == -1)
     {
         perror("bind/listen");
@@ -110,6 +113,7 @@ static int serve(int fd)
 static void *worker(void *argument)
 {
     int client = *(int *)argument;
+
     // The descriptor has been copied locally, so the heap argument is no longer needed.
     free(argument); /* Each thread owns a separate heap-allocated descriptor. */
     serve(client);
@@ -124,6 +128,7 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Usage: %s [port]\n", argv[0]);
         return 1;
     }
+
     // Set thread attributes once and reuse them for each new connection.
     pthread_attr_t attributes;
     int error = pthread_attr_init(&attributes);
@@ -151,6 +156,7 @@ int main(int argc, char *argv[])
             perror("accept");
             break;
         }
+
         // Store the descriptor separately for this thread; a shared loop variable could change
         // too soon.
         int *argument = malloc(sizeof(*argument));

@@ -10,6 +10,7 @@ int main(void)
     int fd[2];
     char buffer[128];
     const char message[] = "Hello through a pipe!";
+
     // Create the pipe before trying to send any data through it.
     if (pipe(fd) == -1)
     {
@@ -31,6 +32,7 @@ int main(void)
         perror("read");
         return 1;
     }
+
     // read returns a byte count, not a C string. Add the null character ourselves.
     buffer[n] = '\0';
     printf("Read from pipe: %s\n", buffer);

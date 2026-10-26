@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <signal.h>
 #include <sys/time.h>
+
 // Use a flag that the handler can safely change and the main loop can check.
 static volatile sig_atomic_t expired = 0;
 
@@ -17,7 +18,10 @@ static void on_timer(int number)
 int main(void)
 {
     // Install the handler before starting the timer so its first signal is not missed.
-    struct sigaction action = {0};
+    struct sigaction action =
+    {
+        0
+    };
     action.sa_handler = on_timer;
     sigemptyset(&action.sa_mask);
     if (sigaction(SIGALRM, &action, NULL) == -1)
@@ -28,8 +32,19 @@ int main(void)
     /* First expiration and repeating interval are both 10 s + 10 us.
        Signal delivery is not guaranteed to be precise to a microsecond. */
     // Set both the first delay and the repeat delay. This timer counts wall-clock time.
-    struct itimerval timer = {.it_value = {.tv_sec = 10, .tv_usec = 10},
-                              .it_interval = {.tv_sec = 10, .tv_usec = 10}};
+    struct itimerval timer =
+    {
+        .it_value =
+        {
+            .tv_sec = 10,
+            .tv_usec = 10
+        },
+        .it_interval =
+        {
+            .tv_sec = 10,
+            .tv_usec = 10
+        }
+    };
     printf("ITIMER_REAL: waiting for 10 seconds and 10 microseconds.\n");
     if (setitimer(ITIMER_REAL, &timer, NULL) == -1)
     {
@@ -42,8 +57,12 @@ int main(void)
     while (!expired)
     {
     }
+
     // A timer filled with zeros turns the interval timer off.
-    timer = (struct itimerval){0};
+    timer = (struct itimerval)
+    {
+        0
+    };
     if (setitimer(ITIMER_REAL, &timer, NULL) == -1)
     {
         perror("disable timer");

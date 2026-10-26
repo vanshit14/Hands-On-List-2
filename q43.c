@@ -27,18 +27,24 @@ int main(int argc, char *argv[])
     {
         long type;
         char text[256];
-    } message = {.type = 1};
+    } message =
+    {
+        .type = 1
+    };
 
     // Use the supplied message, or a short default message if none was given.
     const char *text = argc > 1 ? argv[1] : "Hello message queue!";
+
     // Check the length before copying so the message fits in the fixed-size buffer.
     if (strlen(text) >= sizeof(message.text))
     {
         fputs("Message must be shorter than 256 bytes.\n", stderr);
         return 1;
     }
+
     // Copy the text after the length check. Its type is 1, which must be positive.
     strcpy(message.text, text);
+
     // Find the existing queue rather than creating a new one for each send.
     int id = get_queue();
     /* msgsz excludes the leading long message-type field. */

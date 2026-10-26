@@ -20,7 +20,12 @@ union semun
 // A change of -1 takes a semaphore slot; +1 gives it back. A worker waits if no slot is free.
 static int change(int id, short delta)
 {
-    struct sembuf op = {.sem_num = 0, .sem_op = delta, .sem_flg = SEM_UNDO};
+    struct sembuf op =
+    {
+        .sem_num = 0,
+        .sem_op = delta,
+        .sem_flg = SEM_UNDO
+    };
     /* SEM_UNDO releases the process's outstanding reservation on exit. */
     while (semop(id, &op, 1) == -1)
     {
@@ -42,7 +47,10 @@ static int make_sem(int value)
         perror("semget");
         return -1;
     }
-    union semun arg = {.val = value};
+    union semun arg =
+    {
+        .val = value
+    };
     if (semctl(id, 0, SETVAL, arg) == -1)
     {
         perror("SETVAL");
@@ -87,6 +95,7 @@ int main(void)
     }
     pid_t children[5];
     int count = 0, result = 0;
+
     // Start more workers than there are slots so some workers must wait.
     for (int i = 0; i < 5; ++i)
     {
@@ -110,6 +119,7 @@ int main(void)
             sleep(1); /* Simulated resource use. */
             printf("Worker %ld releases its slot.\n", (long)getpid());
             fflush(stdout);
+
             // Return the slot after the simulated work is complete.
             if (change(id, 1) == -1)
             {
@@ -119,6 +129,7 @@ int main(void)
         }
         children[count++] = pid;
     }
+
     // Wait for all five workers before deleting the semaphore.
     return finish(id, children, count, result);
 }

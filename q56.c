@@ -22,15 +22,18 @@ int main(void)
     (void)getppid(); /* Warm up lazy symbol resolution outside the measurement. */
     // Take the first counter reading immediately before the loop.
     uint64_t start = timestamp();
+
     // Call getppid exactly one hundred times inside the measured section.
     for (int i = 0; i < 100; ++i)
     {
         parent = getppid();
     }
+
     // The difference between the readings gives the elapsed timestamp-counter ticks.
     uint64_t end = timestamp();
     printf("Last parent PID: %ld\n", (long)parent);
     printf("100 getppid calls: %llu TSC ticks\n", (unsigned long long)(end - start));
+
     // Divide the total by one hundred to estimate the average cost per call.
     printf("Average: %.2f TSC ticks per call\n", (double)(end - start) / 100.0);
     /* Includes loop/counter overhead and scheduling noise. Modern invariant

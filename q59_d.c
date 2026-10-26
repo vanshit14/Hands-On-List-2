@@ -5,6 +5,7 @@
 #include <signal.h>
 #include <unistd.h>
 #include <sys/time.h>
+
 // Share a small flag between the handler and the main program.
 static volatile sig_atomic_t received = 0;
 
@@ -23,14 +24,16 @@ int main(void)
         perror("signal");
         return 1;
     }
+
     // Start a one-second wall-clock timer. It sends SIGALRM when it expires.
     alarm(1); /* One-shot wall-clock timer, in seconds. */
     /* Busy work advances virtual/profiling CPU timers. Testing a flag avoids
-       // Keep executing until the signal handler records that the timer has expired.
        the race in while (!received) pause() if a signal arrives before pause. */
+    // Keep executing until the signal handler records that the timer has expired.
     while (!received)
     {
     }
+
     // The flag is now set, so the timer signal was handled successfully.
     puts("Caught SIGALRM using signal().");
     return 0;

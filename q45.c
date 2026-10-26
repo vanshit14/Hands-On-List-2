@@ -30,6 +30,7 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Usage: %s [octal-mode]\n", argv[0]);
         return 1;
     }
+
     // Read permissions in base 8, the same notation used by chmod.
     if (argc == 2)
     {
@@ -44,6 +45,7 @@ int main(int argc, char *argv[])
     }
     struct msqid_ds info;
     int id = get_queue();
+
     // Fetch the current settings before changing the permission bits.
     if (msgctl(id, IPC_STAT, &info) == -1)
     {
@@ -51,8 +53,10 @@ int main(int argc, char *argv[])
         return 1;
     }
     printf("Old mode: %03o\n", info.msg_perm.mode & 0777);
+
     // Replace the lower permission bits while keeping the rest of the mode field.
     info.msg_perm.mode = (info.msg_perm.mode & ~0777) | mode;
+
     // Ask the kernel to apply the changed permissions to the existing queue.
     if (msgctl(id, IPC_SET, &info) == -1)
     {

@@ -17,8 +17,14 @@ int main(void)
     }
     printf("PID: %ld. SIGINT ignored for 5 seconds; try Ctrl+C now.\n", (long)getpid());
     fflush(stdout);
+
     // Keep this phase active for five seconds so there is time to try Ctrl+C.
-    struct timespec remaining = {.tv_sec = 5, .tv_nsec = 0};
+    struct timespec remaining =
+    {
+        .tv_sec = 5,
+        .tv_nsec = 0
+    };
+
     // If another signal interrupts the sleep, continue sleeping for the time left.
     while (nanosleep(&remaining, &remaining) == -1)
     {
@@ -28,6 +34,7 @@ int main(void)
             return 1;
         }
     }
+
     // Restore the normal SIGINT action, which terminates the process.
     if (signal(SIGINT, SIG_DFL) == SIG_ERR)
     {

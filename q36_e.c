@@ -13,9 +13,11 @@ int main(void)
         perror("mkfifo");
         return 1;
     }
+
     // The FIFO can now be opened by a reader and a writer in separate processes.
     puts("Created q36_mkfifo_fifo. Inspect: ls -l q36_mkfifo_fifo");
     puts("Cleanup: rm q36_mkfifo_fifo");
+
     // Exiting closes the program, but the named pipe remains until it is removed.
     return 0;
 }

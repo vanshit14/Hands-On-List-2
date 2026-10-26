@@ -17,6 +17,7 @@ int main(void)
     }
     pid_t children[3];
     int created = 0, result = 0;
+
     // Create one child for each command in the pipeline.
     for (int i = 0; i < 3; ++i)
     {
@@ -27,6 +28,7 @@ int main(void)
             result = 1;
             break;
         }
+
         // Each child redirects only the input or output needed by its command.
         if (pid == 0)
         {
@@ -58,6 +60,7 @@ int main(void)
             perror("exec");
             _exit(1);
         }
+
         // Save each child's PID so the parent can wait for every command.
         children[created++] = pid;
     }
@@ -65,6 +68,7 @@ int main(void)
     close(p[1]);
     close(q[0]);
     close(q[1]);
+
     // A pipeline is finished only after all three commands have exited.
     for (int i = 0; i < created; ++i)
     {

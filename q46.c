@@ -24,12 +24,14 @@ int main(void)
 {
     // Look up the assignment queue using the same key as q41.
     int id = get_queue();
+
     // Remove the queue from the kernel. Any messages still in it are discarded.
     if (msgctl(id, IPC_RMID, NULL) == -1)
     {
         perror("IPC_RMID");
         return 1;
     }
+
     // Print the ID so we can see which queue was removed.
     printf("Removed message queue %d.\n", id);
     return 0;

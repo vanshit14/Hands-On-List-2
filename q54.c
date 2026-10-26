@@ -25,37 +25,87 @@ int main(void)
     {
         int resource;
         const char *name;
-    } limits[] = {
-        {RLIMIT_CPU, "CPU time (seconds)"},
-        {RLIMIT_FSIZE, "File size (bytes)"},
-        {RLIMIT_DATA, "Data segment (bytes)"},
-        {RLIMIT_STACK, "Stack (bytes)"},
-        {RLIMIT_CORE, "Core file (bytes)"},
-        {RLIMIT_RSS, "Resident set (bytes)"},
-        {RLIMIT_NPROC, "Processes per real UID"},
-        {RLIMIT_NOFILE, "Open file descriptors"},
-        {RLIMIT_MEMLOCK, "Locked memory (bytes)"},
-        {RLIMIT_AS, "Address space (bytes)"},
+    } limits[] =
+    {
+        {
+            RLIMIT_CPU,
+            "CPU time (seconds)"
+        },
+        {
+            RLIMIT_FSIZE,
+            "File size (bytes)"
+        },
+        {
+            RLIMIT_DATA,
+            "Data segment (bytes)"
+        },
+        {
+            RLIMIT_STACK,
+            "Stack (bytes)"
+        },
+        {
+            RLIMIT_CORE,
+            "Core file (bytes)"
+        },
+        {
+            RLIMIT_RSS,
+            "Resident set (bytes)"
+        },
+        {
+            RLIMIT_NPROC,
+            "Processes per real UID"
+        },
+        {
+            RLIMIT_NOFILE,
+            "Open file descriptors"
+        },
+        {
+            RLIMIT_MEMLOCK,
+            "Locked memory (bytes)"
+        },
+        {
+            RLIMIT_AS,
+            "Address space (bytes)"
+        },
 #ifdef RLIMIT_LOCKS
-        {RLIMIT_LOCKS, "File locks"},
+        {
+            RLIMIT_LOCKS,
+            "File locks"
+        },
 #endif
 #ifdef RLIMIT_SIGPENDING
-        {RLIMIT_SIGPENDING, "Pending signals"},
+        {
+            RLIMIT_SIGPENDING,
+            "Pending signals"
+        },
 #endif
 #ifdef RLIMIT_MSGQUEUE
-        {RLIMIT_MSGQUEUE, "POSIX message queue bytes"},
+        {
+            RLIMIT_MSGQUEUE,
+            "POSIX message queue bytes"
+        },
 #endif
 #ifdef RLIMIT_NICE
-        {RLIMIT_NICE, "Nice ceiling"},
+        {
+            RLIMIT_NICE,
+            "Nice ceiling"
+        },
 #endif
 #ifdef RLIMIT_RTPRIO
-        {RLIMIT_RTPRIO, "Realtime priority"},
+        {
+            RLIMIT_RTPRIO,
+            "Realtime priority"
+        },
 #endif
 #ifdef RLIMIT_RTTIME
-        {RLIMIT_RTTIME, "Realtime CPU (microseconds)"},
+        {
+            RLIMIT_RTTIME,
+            "Realtime CPU (microseconds)"
+        },
 #endif
     };
     int result = 0;
+
     // Read each resource separately because limits use different units and may differ between
     // machines.
     for (size_t i = 0; i < sizeof(limits) / sizeof(limits[0]); ++i)

@@ -28,6 +28,7 @@ int main(void)
         perror("pipe");
         return 1;
     }
+
     // Create the process that will run ls.
     pid_t left = fork();
     if (left == -1)
@@ -45,11 +46,13 @@ int main(void)
         }
         close(fd[0]);
         close(fd[1]);
+
         // Replace this child with ls. exec returns only if it fails.
         execlp("ls", "ls", "-l", (char *)NULL);
         perror("exec ls");
         _exit(1);
     }
+
     // Create a second child for wc so both commands can run at the same time.
     pid_t right = fork();
     if (right == -1)
@@ -77,6 +80,7 @@ int main(void)
     /* Parent must close its write end so wc can observe EOF. */
     close(fd[0]);
     close(fd[1]);
+
     // Wait for both commands and check that neither failed.
     int s1, s2;
     if (waitpid(left, &s1, 0) == -1 || waitpid(right, &s2, 0) == -1)

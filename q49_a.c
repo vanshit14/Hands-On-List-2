@@ -21,7 +21,12 @@ union semun
 // A change of -1 takes a semaphore slot; +1 gives it back. A worker waits if no slot is free.
 static int change(int id, short delta)
 {
-    struct sembuf op = {.sem_num = 0, .sem_op = delta, .sem_flg = SEM_UNDO};
+    struct sembuf op =
+    {
+        .sem_num = 0,
+        .sem_op = delta,
+        .sem_flg = SEM_UNDO
+    };
     /* SEM_UNDO releases the process's outstanding reservation on exit. */
     while (semop(id, &op, 1) == -1)
     {
@@ -43,7 +48,10 @@ static int make_sem(int value)
         perror("semget");
         return -1;
     }
-    union semun arg = {.val = value};
+    union semun arg =
+    {
+        .val = value
+    };
     if (semctl(id, 0, SETVAL, arg) == -1)
     {
         perror("SETVAL");
@@ -82,6 +90,7 @@ int main(void)
     /* One run launches four cooperating booking processes.
        Use a fresh file per run: independent runs do not share this semaphore. */
     char path[] = "q49_tickets_XXXXXX";
+
     // Open a separate ticket file for this run so old ticket data cannot affect the example.
     int fd = mkstemp(path), ticket = 0;
     if (fd == -1)
@@ -96,6 +105,7 @@ int main(void)
         unlink(path);
         return 1;
     }
+
     // One available slot means only one booking process can update the ticket file at a time.
     int id = make_sem(1);
     if (id == -1)
@@ -108,6 +118,7 @@ int main(void)
     fflush(stdout);
     pid_t children[4];
     int count = 0, result = 0;
+
     // Start four booking processes that all use the same file and semaphore.
     for (int i = 0; i < 4; ++i)
     {
@@ -132,6 +143,7 @@ int main(void)
                 perror("pread");
                 _exit(1);
             }
+
             // The next ticket is one greater than the last stored ticket.
             ++ticket;
             if (pwrite(fd, &ticket, sizeof(ticket), 0) != sizeof(ticket))
@@ -141,6 +153,7 @@ int main(void)
             }
             printf("Process %ld booked ticket %d\n", (long)getpid(), ticket);
             fflush(stdout);
+
             // Release the lock only after the updated ticket has been written.
             if (change(id, 1) == -1)
             {
@@ -151,6 +164,7 @@ int main(void)
         }
         children[count++] = pid;
     }
+
     // Wait for every booking to finish, then remove the semaphore.
     result = finish(id, children, count, result);
     close(fd);

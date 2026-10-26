@@ -20,7 +20,12 @@ union semun
 // Decrease the chosen semaphore by one. If it is already zero, this call waits.
 static int take(int id, unsigned short index)
 {
-    struct sembuf op = {index, -1, 0};
+    struct sembuf op =
+    {
+        index,
+        -1,
+        0
+    };
     return semop(id, &op, 1);
 }
 
@@ -33,15 +38,24 @@ int main(void)
         perror("semget");
         return 1;
     }
+
     // Both resources start free, so each semaphore begins at one.
-    unsigned short values[] = {1, 1};
-    union semun arg = {.array = values};
+    unsigned short values[] =
+    {
+        1,
+        1
+    };
+    union semun arg =
+    {
+        .array = values
+    };
     if (semctl(id, 0, SETALL, arg) == -1)
     {
         perror("SETALL");
         semctl(id, 0, IPC_RMID);
         return 1;
     }
+
     // Use pipes to make sure both children hold their first resource before requesting the
     // other.
     int ready[2], go[2];
@@ -66,6 +80,7 @@ int main(void)
         {
             close(ready[0]);
             close(go[1]);
+
             // Each child takes a different resource first.
             if (take(id, (unsigned short)i) == -1)
             {
@@ -73,6 +88,7 @@ int main(void)
             }
             printf("Child %d holds semaphore %d.\n", i, i);
             fflush(stdout);
+
             // Tell the parent that this child's first resource has been acquired.
             if (write(ready[1], "R", 1) != 1)
             {
@@ -111,6 +127,7 @@ int main(void)
                 result = 1;
             }
         }
+
         // Let both children request the second resource only after both are holding the first.
         if (write(go[1], "GG", 2) != 2)
         {
@@ -123,6 +140,7 @@ int main(void)
     }
     close(ready[0]);
     close(go[1]);
+
     // Removing the set wakes the blocked children, allowing this demonstration to finish.
     if (semctl(id, 0, IPC_RMID) == -1)
     {

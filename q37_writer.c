@@ -35,6 +35,7 @@ int main(void)
         perror("open");
         return 1;
     }
+
     // This example sends one short message. The reader prints the bytes it receives.
     const char message[] = "Hello from the FIFO writer!\n";
     if (write(fd, message, sizeof(message) - 1) == -1)
@@ -42,6 +43,7 @@ int main(void)
         perror("write");
         return 1;
     }
+
     // Closing the last write end lets the reader know that no more data is coming.
     close(fd);
     puts("Message sent. After both programs exit: rm q37_fifo");

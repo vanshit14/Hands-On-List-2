@@ -62,9 +62,12 @@ static int listen_socket(int port)
         close(fd);
         exit(1);
     }
-    struct sockaddr_in address = {.sin_family = AF_INET,
-                                  .sin_port = htons((unsigned short)port),
-                                  .sin_addr.s_addr = htonl(INADDR_ANY)};
+    struct sockaddr_in address =
+    {
+        .sin_family = AF_INET,
+        .sin_port = htons((unsigned short)port),
+        .sin_addr.s_addr = htonl(INADDR_ANY)
+    };
     if (bind(fd, (struct sockaddr *)&address, sizeof(address)) == -1 || listen(fd, 10) == -1)
     {
         perror("bind/listen");
@@ -113,8 +116,12 @@ int main(int argc, char *argv[])
         return 1;
     }
     /* SA_NOCLDWAIT avoids accumulating zombie children on Linux. */
-    struct sigaction action = {0};
+    struct sigaction action =
+    {
+        0
+    };
     action.sa_handler = SIG_DFL;
+
     // Let Linux clean up completed child processes so the server does not leave zombies.
     action.sa_flags = SA_NOCLDWAIT | SA_RESTART;
     sigemptyset(&action.sa_mask);
@@ -123,6 +130,7 @@ int main(int argc, char *argv[])
         perror("sigaction");
         return 1;
     }
+
     // The parent keeps this listening socket and uses it to accept new clients.
     int listener = listen_socket(argc == 2 ? port_number(argv[1]) : 8080);
     for (;;)
@@ -140,6 +148,7 @@ int main(int argc, char *argv[])
             close(listener);
             return 1;
         }
+
         // Give the new connection to a child so the parent can accept another client
         // immediately.
         pid_t pid = fork();
@@ -149,6 +158,7 @@ int main(int argc, char *argv[])
             close(client);
             continue;
         }
+
         // This child serves just one client and then exits.
         if (pid == 0)
         {

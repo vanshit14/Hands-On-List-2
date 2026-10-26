@@ -13,6 +13,7 @@ int main(void)
         perror("pipe");
         return 1;
     }
+
     // After fork, both processes inherit the pipe descriptors, so they can use the same pipe.
     pid_t pid = fork();
     if (pid == -1)
@@ -20,10 +21,12 @@ int main(void)
         perror("fork");
         return 1;
     }
+
     // fork returns zero in the child. This branch receives the parent's message.
     if (pid == 0)
     {
         char buffer[128];
+
         // The child does not send anything, so it closes its copy of the write end.
         close(fd[1]); /* Child only reads. */
         ssize_t n = read(fd[0], buffer, sizeof(buffer) - 1);
@@ -37,6 +40,7 @@ int main(void)
         close(fd[0]);
         return 0;
     }
+
     // Only the parent reaches this part. It keeps the write end and sends the message.
     close(fd[0]); /* Parent only writes. */
     const char message[] = "Hello child, from your parent!";
@@ -47,6 +51,7 @@ int main(void)
     }
     close(fd[1]);
     int status;
+
     // Wait for the child to finish reading and report whether it ended successfully.
     if (waitpid(pid, &status, 0) == -1)
     {

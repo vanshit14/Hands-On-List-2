@@ -13,6 +13,7 @@ int main(void)
         perror("getrlimit");
         return 1;
     }
+
     // Copy both fields so the hard limit stays unchanged.
     after = before;
     /* Lower only the soft limit; no elevated privilege is required. */
@@ -25,12 +26,14 @@ int main(void)
         after.rlim_cur /= 2;
     }
     printf("Old soft limit: %llu\n", (unsigned long long)before.rlim_cur);
+
     // Apply the lower soft limit to this process.
     if (setrlimit(RLIMIT_NOFILE, &after) == -1)
     {
         perror("setrlimit");
         return 1;
     }
+
     // Read the limit again to show that the kernel accepted the change.
     if (getrlimit(RLIMIT_NOFILE, &after) == -1)
     {

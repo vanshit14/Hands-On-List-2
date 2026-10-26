@@ -20,7 +20,13 @@ int main(void)
 {
     // Keep the thread handles so main can join all the threads it creates.
     pthread_t threads[3];
-    int indices[3] = {1, 2, 3}, created = 0, result = 0;
+    int indices[3] =
+    {
+        1,
+        2,
+        3
+    }, created = 0, result = 0;
+
     // Create three threads. Scheduling decides which one prints first.
     for (int i = 0; i < 3; ++i)
     {
@@ -34,6 +40,7 @@ int main(void)
         }
         ++created;
     }
+
     // Joining waits for each worker to finish before main returns.
     for (int i = 0; i < created; ++i)
     {

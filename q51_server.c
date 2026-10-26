@@ -62,9 +62,12 @@ static int listen_socket(int port)
         close(fd);
         exit(1);
     }
-    struct sockaddr_in address = {.sin_family = AF_INET,
-                                  .sin_port = htons((unsigned short)port),
-                                  .sin_addr.s_addr = htonl(INADDR_ANY)};
+    struct sockaddr_in address =
+    {
+        .sin_family = AF_INET,
+        .sin_port = htons((unsigned short)port),
+        .sin_addr.s_addr = htonl(INADDR_ANY)
+    };
     if (bind(fd, (struct sockaddr *)&address, sizeof(address)) == -1 || listen(fd, 10) == -1)
     {
         perror("bind/listen");
@@ -112,8 +115,10 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Usage: %s [port]\n", argv[0]);
         return 1;
     }
+
     // Start listening on the requested port, or use 8080 when no port is supplied.
     int listener = listen_socket(argc == 2 ? port_number(argv[1]) : 8080);
+
     // Wait for one connection. accept returns a new socket just for that client.
     int client = accept(listener, NULL, NULL);
     if (client == -1)
@@ -125,6 +130,7 @@ int main(int argc, char *argv[])
     /* This introductory server handles one connection, then exits. */
     // Echo the client's bytes until it finishes sending.
     int result = serve(client);
+
     // Close both the connected socket and the listening socket before ending.
     close(client);
     close(listener);

@@ -18,6 +18,7 @@ static void handler(int number)
 int main(void)
 {
     errno = 0;
+
     // Ask to install a handler. The kernel rejects this because SIGSTOP cannot be caught.
     if (signal(SIGSTOP, handler) == SIG_ERR)
     {
@@ -28,11 +29,13 @@ int main(void)
         fputs("Unexpectedly registered SIGSTOP handler.\n", stderr);
         return 1;
     }
+
     // Give the sender this PID so it can stop this particular process.
     printf("Receiver PID: %ld\nIn another terminal: ./q64_sender %ld\n", (long)getpid(),
            (long)getpid());
     puts("SIGSTOP suspends me. SIGCONT resumes me; Ctrl+C then ends me.");
     fflush(stdout);
+
     // Wait here. SIGSTOP suspends the whole process; SIGCONT lets it run again.
     for (;;)
     {

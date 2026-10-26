@@ -36,6 +36,7 @@ int main(void)
     // Try to receive the oldest message immediately. IPC_NOWAIT prevents waiting on an empty
     // queue.
     ssize_t n = msgrcv(id, &message, sizeof(message.text) - 1, 0, IPC_NOWAIT);
+
     // A negative result means no message was received; errno explains the reason.
     if (n == -1)
     {
@@ -47,8 +48,10 @@ int main(void)
         perror("msgrcv");
         return 1;
     }
+
     // Add a null character after the received bytes before printing the message.
     message.text[n] = '\0';
+
     // Display both the message type and its text. Receiving also removes the message from the
     // queue.
     printf("Received type %ld: %s\n", message.type, message.text);

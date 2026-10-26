@@ -20,6 +20,7 @@ int main(void)
         perror("shmget");
         return 1;
     }
+
     // Attach the segment to this process so it can be accessed through a pointer.
     char *memory = shmat(id, NULL, 0);
     if (memory == (void *)-1)
@@ -28,9 +29,11 @@ int main(void)
         shmctl(id, IPC_RMID, NULL);
         return 1;
     }
+
     // Write through the normal attachment before testing a read-only attachment.
     strcpy(memory, "Data written to shared memory.");
     printf("Shared memory ID: %d\nData: %s\n", id, memory);
+
     // Detach this first mapping; the segment itself still exists in the kernel.
     if (shmdt(memory) == -1)
     {
@@ -39,6 +42,7 @@ int main(void)
         return 1;
     }
     fflush(NULL);
+
     // Test the invalid write in a child so the parent can check the result and clean up.
     pid_t child = fork();
     if (child == -1)
@@ -62,7 +66,11 @@ int main(void)
         puts("Attempting overwrite in the child: expect SIGSEGV.");
         fflush(stdout);
         /* Avoid a core file for this deliberately faulting demonstration. */
-        struct rlimit no_core = {0, 0};
+        struct rlimit no_core =
+        {
+            0,
+            0
+        };
         if (setrlimit(RLIMIT_CORE, &no_core) == -1)
         {
             perror("setrlimit");
@@ -74,6 +82,7 @@ int main(void)
         _exit(2); /* Reaching here means the protection did not work. */
     }
     int status, result = 0;
+
     // Wait for the test child and inspect the signal that ended it.
     if (waitpid(child, &status, 0) == -1)
     {

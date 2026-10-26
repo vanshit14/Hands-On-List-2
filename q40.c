@@ -10,6 +10,7 @@
 int main(void)
 {
     struct rlimit limit;
+
     // Read the limit that controls how many file descriptors this process may use.
     if (getrlimit(RLIMIT_NOFILE, &limit) == -1)
     {
@@ -24,6 +25,7 @@ int main(void)
     {
         printf("Open-file soft limit: %llu\n", (unsigned long long)limit.rlim_cur);
     }
+
     // Create a real pipe so we can ask the kernel about its current buffer size.
     int fd[2];
     if (pipe(fd) == -1)
@@ -40,6 +42,7 @@ int main(void)
         return 1;
     }
     printf("Pipe buffer capacity: %d bytes\n", capacity);
+
     // Also ask how large a write can be without its bytes mixing with another writer's write.
     long atomic = fpathconf(fd[0], _PC_PIPE_BUF);
     if (atomic == -1)
@@ -49,6 +52,7 @@ int main(void)
     }
     /* PIPE_BUF is the atomic-write limit, not the total pipe capacity. */
     printf("PIPE_BUF (atomic write limit): %ld bytes\n", atomic);
+
     // Neither end is needed after the measurements, so release both descriptors.
     close(fd[0]);
     close(fd[1]);

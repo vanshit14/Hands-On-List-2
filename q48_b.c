@@ -25,8 +25,13 @@ int main(void)
         perror("semget");
         return 1;
     }
+
     // A starting value of 2 represents two available slots, so two users can proceed together.
-    union semun arg = {.val = 2};
+    union semun arg =
+    {
+        .val = 2
+    };
+
     // Set the value of semaphore number 0 in this set.
     if (semctl(id, 0, SETVAL, arg) == -1)
     {
@@ -34,9 +39,11 @@ int main(void)
         semctl(id, 0, IPC_RMID);
         return 1;
     }
+
     // Save this ID if you want to inspect or remove the semaphore in another program.
     printf("Semaphore ID: %d\nInitial value: %d\n", id, semctl(id, 0, GETVAL));
     printf("Remove after use: ./q49_d %d\n", id);
+
     // Keep the semaphore after exiting so q49_d can demonstrate removing it.
     return 0;
 }

@@ -14,6 +14,7 @@ static int receive(int fd, const char *who)
         perror("read");
         return -1;
     }
+
     // Add a null character after the bytes read so printf can display the text safely.
     buffer[n] = '\0';
     printf("%s received: %s\n", who, buffer);
@@ -29,6 +30,7 @@ int main(void)
         perror("pipe");
         return 1;
     }
+
     // Create the child only after both pipes are ready.
     pid_t pid = fork();
     if (pid == -1)
@@ -36,6 +38,7 @@ int main(void)
         perror("fork");
         return 1;
     }
+
     // The child first reads the request and then writes a reply through the other pipe.
     if (pid == 0)
     {
@@ -57,6 +60,7 @@ int main(void)
     }
     close(to_child[0]);
     close(to_parent[1]);
+
     // The parent starts the conversation by sending its request.
     const char message[] = "Hello child!";
     if (write(to_child[1], message, sizeof(message) - 1) == -1)
@@ -69,6 +73,7 @@ int main(void)
     int result = receive(to_parent[0], "Parent");
     close(to_parent[0]);
     int status;
+
     // Collect the child's exit status after the reply has been received.
     if (waitpid(pid, &status, 0) == -1)
     {

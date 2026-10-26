@@ -27,6 +27,7 @@ int main(int argc, char *argv[])
     }
     char *end;
     errno = 0;
+
     // Convert the ID to a number and check that the whole argument was valid.
     long id = strtol(argv[1], &end, 10);
     if (errno || end == argv[1] || *end || id < 0 || id > INT_MAX)
@@ -34,12 +35,14 @@ int main(int argc, char *argv[])
         fputs("Invalid semaphore ID.\n", stderr);
         return 1;
     }
+
     // Remove the entire semaphore set identified by this ID.
     if (semctl((int)id, 0, IPC_RMID) == -1)
     {
         perror("IPC_RMID");
         return 1;
     }
+
     // The set no longer exists after this call succeeds.
     printf("Removed semaphore set %ld.\n", id);
     return 0;

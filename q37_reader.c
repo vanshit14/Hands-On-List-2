@@ -27,6 +27,7 @@ int main(void)
 {
     // Both programs use this name to access the same named pipe.
     ensure_fifo("q37_fifo");
+
     // Open the FIFO for reading. The open waits until a writer connects.
     int fd = open("q37_fifo", O_RDONLY);
     if (fd == -1)
@@ -36,6 +37,7 @@ int main(void)
     }
     char buffer[128];
     ssize_t n;
+
     // Keep reading until the writer closes its end and read returns zero.
     while ((n = read(fd, buffer, sizeof(buffer))) > 0)
     {
@@ -52,6 +54,7 @@ int main(void)
         perror("read");
         return 1;
     }
+
     // Release our read descriptor after the message has been received.
     close(fd);
     return 0;

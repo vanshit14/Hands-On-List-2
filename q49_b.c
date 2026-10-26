@@ -21,7 +21,12 @@ union semun
 // A change of -1 takes a semaphore slot; +1 gives it back. A worker waits if no slot is free.
 static int change(int id, short delta)
 {
-    struct sembuf op = {.sem_num = 0, .sem_op = delta, .sem_flg = SEM_UNDO};
+    struct sembuf op =
+    {
+        .sem_num = 0,
+        .sem_op = delta,
+        .sem_flg = SEM_UNDO
+    };
     /* SEM_UNDO releases the process's outstanding reservation on exit. */
     while (semop(id, &op, 1) == -1)
     {
@@ -43,7 +48,10 @@ static int make_sem(int value)
         perror("semget");
         return -1;
     }
-    union semun arg = {.val = value};
+    union semun arg =
+    {
+        .val = value
+    };
     if (semctl(id, 0, SETVAL, arg) == -1)
     {
         perror("SETVAL");
@@ -86,6 +94,7 @@ int main(void)
         perror("shmget");
         return 1;
     }
+
     // Attach the shared integer and access it through counter.
     int *counter = shmat(shmid, NULL, 0);
     if (counter == (void *)-1)
@@ -101,8 +110,10 @@ int main(void)
         shmdt(counter);
         return 1;
     }
+
     // Start from zero before any worker is created.
     *counter = 0;
+
     // A binary semaphore allows only one child to update the counter at a time.
     int id = make_sem(1);
     if (id == -1)
@@ -112,6 +123,7 @@ int main(void)
     }
     pid_t children[4];
     int count = 0, result = 0;
+
     // Create four workers. Each worker adds one to the shared counter a thousand times.
     for (int i = 0; i < 4; ++i)
     {
@@ -146,8 +158,10 @@ int main(void)
         }
         children[count++] = pid;
     }
+
     // Wait for all workers before checking the final value.
     result = finish(id, children, count, result);
+
     // Four successful workers should produce 4000. A missing lock could cause updates to be
     // lost.
     printf("Counter: %d; expected: %d\n", *counter, count * 1000);

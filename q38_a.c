@@ -37,6 +37,7 @@ int main(void)
         return 1;
     }
     const char message[] = "Hello from process A!";
+
     // Send one message through the outgoing pipe.
     if (write(out, message, sizeof(message) - 1) == -1)
     {
@@ -44,6 +45,7 @@ int main(void)
         return 1;
     }
     close(out);
+
     // Open the incoming FIFO to receive the other program's message.
     int in = open("q38_b_to_a", O_RDONLY);
     if (in == -1)
@@ -52,6 +54,7 @@ int main(void)
         return 1;
     }
     char buffer[128];
+
     // Read the peer's message, leaving room for a final null character.
     ssize_t n = read(in, buffer, sizeof(buffer) - 1);
     if (n == -1)
@@ -59,6 +62,7 @@ int main(void)
         perror("read");
         return 1;
     }
+
     // Turn the received bytes into a C string before printing them.
     buffer[n] = '\0';
     printf("Process A received: %s\n", buffer);

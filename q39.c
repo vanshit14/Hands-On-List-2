@@ -27,6 +27,7 @@ static void ensure_fifo(const char *path)
 int main(void)
 {
     ensure_fifo("q39_fifo");
+
     // Open without waiting for a writer, because select will handle the waiting for us.
     int fd = open("q39_fifo", O_RDONLY | O_NONBLOCK);
     if (fd == -1)
@@ -47,14 +48,21 @@ int main(void)
         fputs("Descriptor too large for select\n", stderr);
         return 1;
     }
+
     // select takes a set of descriptors. Clear it first, then add our FIFO's read end.
     fd_set readers;
     FD_ZERO(&readers);
     FD_SET(fd, &readers);
+
     // Give select a maximum waiting time of ten seconds.
-    struct timeval timeout = {.tv_sec = 10, .tv_usec = 0};
+    struct timeval timeout =
+    {
+        .tv_sec = 10,
+        .tv_usec = 0
+    };
     puts("Waiting 10 seconds. In another terminal: echo hello > q39_fifo");
     fflush(stdout);
+
     // The first argument is one more than the highest descriptor in the sets.
     int ready = select(fd + 1, &readers, NULL, NULL, &timeout);
     int result = 0;
@@ -63,6 +71,7 @@ int main(void)
         perror("select");
         result = 1;
     }
+
     // A zero result means the full waiting time passed without readable data.
     else if (ready == 0)
     {
@@ -71,6 +80,7 @@ int main(void)
     else
     {
         char buffer[256];
+
         // The FIFO is ready, so read the message and display the bytes received.
         ssize_t n = read(fd, buffer, sizeof(buffer) - 1);
         if (n == -1)
